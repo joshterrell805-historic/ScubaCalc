@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+   <link rel="stylesheet" href="index.css">
+</head>
+<body>
+   <div id="panel">
+      <div id="dive-1" class="dive-metrics-input">
+         <h3 class="dive-count-header">Dive 1</h3>
+         <div class="label-and-input">
+            <span class="label">Depth (ft):</span>
+            <input class="input depth" type="number">
+         </div>
+         <div class="label-and-input">
+            <span class="label">Minutes:</span>
+            <input class="input minutes" type="number">
+         </div>
+      </div>
+      <div id="dive-2" class="dive-metrics-input">
+         <h3 class="dive-count-header">Dive 2</h3>
+         <div class="label-and-input">
+            <span class="label">Depth (ft):</span>
+            <input class="input depth" type="number">
+         </div>
+         <div class="label-and-input">
+            <span class="label">Minutes:</span>
+            <input class="input minutes" id="minutes" type="number">
+         </div>
+      </div>
+      <input id="calculate-button" type="button" value="calculate!">
+   </div>
+   <span id="results">You should wait at least <span id="wait-minutes">N/A</span> minutes before making your second dive.</span>
+</body>
+</html>

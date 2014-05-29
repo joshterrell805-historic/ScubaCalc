@@ -1,0 +1,27 @@
+body {
+  text-align: center; }
+
+.dive-count-header {
+  text-align: center; }
+
+#panel {
+  display: inline-block;
+  background-color: grey;
+  padding: 10px; }
+
+#calculate-button {
+  display: block; }
+
+#results {
+  display: block; }
+
+.label-and-input {
+  text-align: right; }
+
+#calculate-button {
+  margin-top: 15px;
+  margin-left: auto;
+  margin-right: auto; }
+
+#results {
+  margin-top: 30px; }
