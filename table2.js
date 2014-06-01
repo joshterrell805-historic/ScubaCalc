@@ -21,9 +21,15 @@ document.onready = function()
 
       $('#table2').append(tr);
 
+      var altColor = false;
       for (var row = 0, c_start = 0; row < 26; ++row, ++c_start)
       {
          var tr = $('<tr></tr>');
+         if (altColor)
+         {
+            tr.addClass('alt-row-color');
+         }
+         altColor = !altColor;
          for (var i = 0; i < c_start; ++i)
          {
             tr.append($('<td></td>'));
