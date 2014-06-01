@@ -1,0 +1,9 @@
+td {
+  border: 1px solid black; }
+
+.saftey-stop-required {
+  background-color: #DDD; }
+
+.no-decompression-limit {
+  background-color: black;
+  color: white; }
