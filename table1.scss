@@ -1,15 +1,37 @@
-td
+table
 {
-   border: 1px solid black;
+   table-layout: fixed;
+   background-color: #333;
+   border-spacing: 1px;
+
+   td.saftey-stop-required
+   {
+      background-color: rgba(70,70,70,0.5);
+   }
+   tr
+   {
+      background-color: white;
+      td, th
+      {
+         text-align: center;
+         width: 2em;
+      }
+      td.letter
+      {
+         background-color: white;
+      }
+      td.no-decompression-limit
+      {
+         background-color: black;
+         color: white;
+      }
+   }
+   tr.alt-row-color
+   {
+      background-color: #37F;
+   }
 }
 
-.saftey-stop-required
-{
-   background-color: #DDD;
-}
 
-.no-decompression-limit
-{
-   background-color: black;
-   color: white;
-}
+
+

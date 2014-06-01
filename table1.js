@@ -19,12 +19,21 @@ document.onready = function()
 
       $('#table1').append(tr);
 
+      var altColor = true;
       for (var row = 0; row < 26; ++row)
       {
          var tr = $('<tr></tr>');
+
+         if (altColor)
+         {
+            tr.addClass('alt-row-color');
+         }
+         altColor = !altColor;
+
          var td = $(
             '<td>' + String.fromCharCode('A'.charCodeAt(0) + row) + '</td>'
          );
+         td.addClass('letter');
          tr.append(td);
 
          for (var col = 0; col < table.columns.length; ++col)

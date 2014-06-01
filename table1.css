@@ -1,9 +1,18 @@
-td {
-  border: 1px solid black; }
-
-.saftey-stop-required {
-  background-color: #DDD; }
-
-.no-decompression-limit {
-  background-color: black;
-  color: white; }
+table {
+  table-layout: fixed;
+  background-color: #333;
+  border-spacing: 1px; }
+  table td.saftey-stop-required {
+    background-color: rgba(70, 70, 70, 0.5); }
+  table tr {
+    background-color: white; }
+    table tr td, table tr th {
+      text-align: center;
+      width: 2em; }
+    table tr td.letter {
+      background-color: white; }
+    table tr td.no-decompression-limit {
+      background-color: black;
+      color: white; }
+  table tr.alt-row-color {
+    background-color: #37F; }
