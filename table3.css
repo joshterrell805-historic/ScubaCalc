@@ -1,0 +1,11 @@
+table {
+  table-layout: fixed;
+  background-color: #333;
+  border-spacing: 1px; }
+  table tr {
+    background-color: white; }
+    table tr td, table tr th {
+      text-align: center;
+      width: 2em; }
+  table tr.abt {
+    background-color: #37F; }

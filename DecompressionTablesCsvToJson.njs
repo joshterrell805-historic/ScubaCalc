@@ -10,49 +10,14 @@ if (require.main === module)
    var table2 = table2ToObject(
       CsvToArray(fs.readFileSync('./table2.csv').toString())
    );
+   var table3 = table3ToObject(
+      CsvToArray(fs.readFileSync('./table3.csv').toString())
+   );
    var tables = [
-      table1, table2
+      table1, table2, table3
    ];
    tables = JSON.stringify(tables);
    fs.writeFile('./decompression_tables.json', tables);
-}
-
-function table2ToObject(table2Array)
-{
-   var table = {
-      'name'    : table2Array[0][0],
-      'rows' : []
-   };
-
-   assert(table.name);
-
-   assert.strictEqual(table2Array[28][0], 'Z');
-   assert.strictEqual(table2Array[29][26], 'A');
-   assert.strictEqual(table2Array[3][25], 'A');
-
-   for (var r = 28, c_start = 1; r >= 3 && c_start < 27; --r, ++c_start)
-   {
-      var row = [];
-      for (var c = c_start; c < 27; ++c)
-      {
-         var str = table2Array[r][c];
-         var col = {
-            'min' : {
-               'hour' : parseInt(str[0]),
-               'min'  : parseInt(str.substr(2, 2))
-            },
-            'max' : {
-               'hour' : parseInt(str[5]),
-               'min'  : parseInt(str.substr(7, 2))
-            }
-         };
-         row.push(col);
-      }
-
-      table.rows.push(row);
-   }
-
-   return table;
 }
 
 function table1ToObject(table1Array)
@@ -103,6 +68,78 @@ function table1ToObject(table1Array)
             break;
          }
       }
+   }
+
+   return table;
+}
+
+function table2ToObject(table2Array)
+{
+   var table = {
+      'name'    : table2Array[0][0],
+      'rows' : []
+   };
+
+   assert(table.name);
+
+   assert.strictEqual(table2Array[28][0], 'Z');
+   assert.strictEqual(table2Array[29][26], 'A');
+   assert.strictEqual(table2Array[3][25], 'A');
+
+   for (var r = 28, c_start = 1; r >= 3 && c_start < 27; --r, ++c_start)
+   {
+      var row = [];
+      for (var c = c_start; c < 27; ++c)
+      {
+         var str = table2Array[r][c];
+         var col = {
+            'min' : {
+               'hour' : parseInt(str[0]),
+               'min'  : parseInt(str.substr(2, 2))
+            },
+            'max' : {
+               'hour' : parseInt(str[5]),
+               'min'  : parseInt(str.substr(7, 2))
+            }
+         };
+         row.push(col);
+      }
+
+      table.rows.push(row);
+   }
+
+   return table;
+}
+
+function table3ToObject(table3Array)
+{
+   var table = {
+      'name'    : table3Array[0][0],
+      'rows' : []
+   };
+
+   assert(table.name);
+
+   for (var r = 3; r < table3Array.length; r+=2)
+   {
+      var row = {
+         'depth' : parseInt(table3Array[r][0]),
+         'cols'  : []
+      };
+
+      for (var c = 1; c < 27; ++c)
+      {
+         var rnt = table3Array[r][c];
+         var abt = table3Array[r+1][c];
+         var col = {
+            'rnt' : rnt ? parseInt(rnt) : null,
+            'abt' : abt ? parseInt(abt) : null
+         };
+
+         row.cols.push(col);
+      }
+
+      table.rows.push(row);
    }
 
    return table;

@@ -1,0 +1,20 @@
+table
+{
+   table-layout: fixed;
+   background-color: #333;
+   border-spacing: 1px;
+
+   tr
+   {
+      background-color: white;
+      td, th
+      {
+         text-align: center;
+         width: 2em;
+      }
+   }
+   tr.abt
+   {
+      background-color: #37F;
+   }
+}
