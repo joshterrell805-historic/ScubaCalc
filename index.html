@@ -27,8 +27,16 @@
             <input class="input minutes" id="minutes" type="number">
          </div>
       </div>
+      <div id="buttons">
+      <input id="clear-button" type="button" value="clear">
       <input id="calculate-button" type="button" value="calculate!">
+      </div>
    </div>
-   <span id="results">You should wait at least <span id="wait-minutes">N/A</span> minutes before making your second dive.</span>
+   <span id="error"></span>
+   <span id="warning"></span>
+   <span id="results"></span>
+   <span id="notice"></span>
+   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+   <script src="index.js"></script>
 </body>
 </html>

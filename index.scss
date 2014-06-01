@@ -14,10 +14,6 @@ body
    background-color: grey;
    padding: 10px;
 }
-#calculate-button
-{
-   display: block;
-}
 
 #results
 {
@@ -29,14 +25,33 @@ body
    text-align: right;
 }
 
-#calculate-button
+#buttons
 {
-   margin-top: 15px;
+   margin-top: 18px;
    margin-left: auto;
    margin-right: auto;
+   input 
+   {
+      width: 40%;
+      margin-left: 2%;
+      margin-right: 2%;
+   }
 }
 
-#results
+#results, #notice, #error, #warning
 {
+   display: block;
    margin-top: 30px;
+}
+#error
+{
+   color: #A12;
+}
+#warning
+{
+   color: #862;
+}
+#notice
+{
+   color: #393;
 }

@@ -9,19 +9,30 @@ body {
   background-color: grey;
   padding: 10px; }
 
-#calculate-button {
-  display: block; }
-
 #results {
   display: block; }
 
 .label-and-input {
   text-align: right; }
 
-#calculate-button {
-  margin-top: 15px;
+#buttons {
+  margin-top: 18px;
   margin-left: auto;
   margin-right: auto; }
+  #buttons input {
+    width: 40%;
+    margin-left: 2%;
+    margin-right: 2%; }
 
-#results {
+#results, #notice, #error, #warning {
+  display: block;
   margin-top: 30px; }
+
+#error {
+  color: #A12; }
+
+#warning {
+  color: #862; }
+
+#notice {
+  color: #393; }
