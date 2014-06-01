@@ -7,11 +7,52 @@ if (require.main === module)
    var table1 = table1ToObject(
       CsvToArray(fs.readFileSync('./table1.csv').toString())
    );
+   var table2 = table2ToObject(
+      CsvToArray(fs.readFileSync('./table2.csv').toString())
+   );
    var tables = [
-      table1
+      table1, table2
    ];
    tables = JSON.stringify(tables);
    fs.writeFile('./decompression_tables.json', tables);
+}
+
+function table2ToObject(table2Array)
+{
+   var table = {
+      'name'    : table2Array[0][0],
+      'rows' : []
+   };
+
+   assert(table.name);
+
+   assert.strictEqual(table2Array[28][0], 'Z');
+   assert.strictEqual(table2Array[29][26], 'A');
+   assert.strictEqual(table2Array[3][25], 'A');
+
+   for (var r = 28, c_start = 1; r >= 3 && c_start < 27; --r, ++c_start)
+   {
+      var row = [];
+      for (var c = c_start; c < 27; ++c)
+      {
+         var str = table2Array[r][c];
+         var col = {
+            'min' : {
+               'hour' : parseInt(str[0]),
+               'min'  : parseInt(str.substr(2, 2))
+            },
+            'max' : {
+               'hour' : parseInt(str[5]),
+               'min'  : parseInt(str.substr(7, 2))
+            }
+         };
+         row.push(col);
+      }
+
+      table.rows.push(row);
+   }
+
+   return table;
 }
 
 function table1ToObject(table1Array)
@@ -19,7 +60,7 @@ function table1ToObject(table1Array)
    var table = {
       'name'    : table1Array[0][0],
       'columns' : []
-   }
+   };
 
    assert(table.name);
 
