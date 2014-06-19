@@ -23,12 +23,19 @@ function clearAll() {
 }
 
 function calculate() {
+   if (typeof window.tables == "undefined") {
+      setError("please wait a second or so for the decompression tables " +
+       "to finish downloading");
+      return;
+   }
+
    var d1 = $('#dive-1 .depth').val();
    var m1 = $('#dive-1 .minutes').val();
    var m2 = $('#dive-2 .minutes').val();
    var d2 = $('#dive-2 .depth').val();
 
    var dive1data = dive1(d1, m1);
+   var dive2data = dive2(d2, m2);
    if (!dive1data) return;
 
    if (dive1data.roundedMin != m1) {
@@ -53,12 +60,6 @@ function calculate() {
 }
 
 function dive1(depth, min) {
-   if (typeof window.tables == "undefined") {
-      setError("please wait a second or so for the decompression tables " +
-       "to finish downloading");
-      return;
-   }
-
    var matched = window.tables[0].columns.filter(function(col) {
       return col.depth == parseInt(depth);
    });
@@ -132,6 +133,97 @@ function dive1(depth, min) {
       'roundedMin'         : row.min,
       'pressureGroup'      : group
    };
+}
+
+function dive2(depth, min) {
+   var matched = window.tables[2].rows.filter(function(row) {
+      return row.depth == parseInt(depth);
+   });
+
+   if (matched.length == 0) {
+      setError("dive-2 depth is an invalid value." +
+         "<br>Value must be one of: " +
+         window.tables[1].rows.map(function(row) {
+            return row.depth;
+         }).join(', ')
+      );
+      return;
+   }
+
+   if (matched.length > 1) {
+      setError('multiple rows with same depth in table 3', true);
+      return;
+   }
+
+   var row = matched[0];
+   min = parseInt(min);
+   var max = row.cols[row.cols.length - 1].abt;
+   if (isNaN(min) || min < 1 || min > max) {
+      setError('value for dive-2 minutes must be greater than or equal to ' +
+       '1 and less than or equal to ' + max);
+      return;
+   }
+
+   // the number of columns removed from the beginning of this row..
+   // this number must be added to the column index to calculate the group
+   var removedCols = 0;
+   row.cols = row.cols.reduce(function removeEmptyCols(cols, col) {
+      if (col.abt) {
+         if (removedCols) {
+            setError('col exists in table 3 with abt that occurs after first ' +
+             'col without an abt', true);
+            return;
+         }
+         cols.push(col);
+      } else {
+         ++removedCols;
+      }
+      return cols;
+   }, []);
+
+   if (!row.cols) {
+      return;
+   }
+
+   var col = null;
+   if (min > 0 && min < row.cols[0].abt) {
+      col = row.cols[0];
+   }
+
+   // find the appropriate column based on the minutes the user passed.
+   // from the above check we know there is an appropriate column. We want to
+   // round to the closest min
+   for (var i = 0; !col && i < row.cols.length -1; ++i) {
+      if (row.cols[i].abt > row.cols[i + 1]) {
+         setError('table 3\'s abt values are not ascending', true);
+         return;
+      }
+      // note: sometimes the columns have the same abt. In this case, the
+      // max pressure group should be assumed (safety-precaution)
+      // This code by happenstance chooses the lowest index col (highest
+      // pressure group).
+      var diff1 = Math.abs(row.cols[i].abt - min);
+      var diff2 = Math.abs(row.cols[i+1].abt - min);
+      if (diff1 <= diff2) {
+         col = row.cols[i];
+      }
+   }
+
+   // diff2 was always less than diff1, meaning the min the user supplied
+   // is closest to the last column (because the columns are guarenteed to be
+   // ascending).
+   if (!col) {
+      col = row.cols[row.cols.length - 1];
+   }
+
+   var colIndex = row.cols.indexOf(col);
+   if (colIndex == -1) {
+      setError('bad logic. `col` not found in table 3 cols', true);
+      return;
+   }
+
+   // Z = 0; A = 25
+   var group = 25 - (colIndex + removedCols);
 }
 
 function setError(str, internal) {
