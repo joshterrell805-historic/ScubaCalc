@@ -1,0 +1,4 @@
+Test calculate
+Write GUI
+Generalize DiveCalc with different functionality other than just "calc the wait time"
+Return group after dive2 for current calc function
