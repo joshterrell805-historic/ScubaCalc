@@ -1,4 +1,4 @@
-var DiveCalc = (function() {
+var DiveCalc = (function constructDiveCalcClass() {
 
    DiveCalc.prototype = Object.create(Object.prototype);
    DiveCalc.prototype.constructor         = constructor;
@@ -10,17 +10,17 @@ var DiveCalc = (function() {
     _getMinPossibleResidualTimeForDepth;
    DiveCalc.prototype._findMaxGroupGivenMaxRNT =
     _findMaxGroupGivenMaxRNT;
-   DiveCalc.prototype._getStatsAfterDive      = _getStatsAfterDive;
+   DiveCalc.prototype._getDiveStats = _getDiveStats;
    DiveCalc.prototype._getMinTimeBetweenDives = _getMinTimeBetweenDives;
 
    return DiveCalc;
    
-   function DiveCalc() {
-      $.get('decompression_tables.json', function(tables) {
-         this.tables = JSON.parse(tables);
-         // so the tables can be indexed as 1, 2, 3 (readability)
-         this.tables.unshift({});
-      }.bind(this));
+   // pass a json string of decompression_tables.json
+   function DiveCalc(tablesJson, debug) {
+      this.debug = !!debug;
+      this.tables = JSON.parse(tablesJson);
+      // so the tables can be indexed as 1, 2, 3 (readability)
+      this.tables.unshift({});
    }
 
    /**
@@ -53,25 +53,20 @@ var DiveCalc = (function() {
     *    NotReadyError  - the tables haven't completed downloading yet
     *    InputError     - the arguments provided are invalid
     *    TableDataError - the table contains data which is unexpected/invalid
-    *    Error          - probably a programmer error
+    *    LogicError     - probably a programmer error
     *
     */
    function calcWaitTime(d1_min, d1_depth, d2_min, d2_depth) {
-      if (typeof this.tables === 'undefined') {
-         throw new NotReadyError(
-          'The data tables have not completed downloading yet');
-      }
-
       d1_min = parseInt(d1_min);
       d2_min = parseInt(d2_min);
 
-      if (!this._isValidDepth(d1_depth, 1) {
+      if (!this._isValidDepth(d1_depth, 1)) {
          throw new InputError('d1_depth', this._getValidDepths(1).join(', '));
       }
-      if (!this._isValidDepth(d2_depth, 1) {
+      if (!this._isValidDepth(d2_depth, 1)) {
          throw new InputError('d2_depth', this._getValidDepths(1).join(', '));
       }
-      if (!this._isValidDepth(d2_depth, 3) {
+      if (!this._isValidDepth(d2_depth, 3)) {
          throw new InputError('d2_depth', this._getValidDepths(3).join(', '));
       }
 
@@ -81,22 +76,31 @@ var DiveCalc = (function() {
          'limit' : this._getMaxTotalTime('limit', d2_depth)
       };
 
-      var retval = {};
+      var retVal = {};
 
       var firstDiveStats = this._getDiveStats(d1_min, d1_depth);
 
+      if (this.debug) {
+         console.log('Group after dive 1: ' + firstDiveStats.group);
+      }
+
       // calculate the minimum minutes to wait between dives for each saftey type
-      Object.keys(maxTotalMin).forEach(function minTime(safteyType) {
+      Object.keys(maxTotalMin).forEach(function minTime(safetyType) {
          // max residual nitrogen time possible when making dive 2 at the
          // specified dive 2 saftey type for the specified min.
          // calculated from
          //                      rnt + dive time = max total min
          //
-         var maxResidualTime = maxTotalMin[safteyType] -  d2_min;
+         var maxResidualTime = maxTotalMin[safetyType] -  d2_min;
          // the minimum residual time on table 3 for depth2
          var minPossibleResidualTime =
           this._getMinPossibleResidualTimeForDepth(d2_depth);
 
+         if (this.debug) {
+            console.log('--------' + safetyType + '---------');
+            console.log('Max total min dive2: ' + maxTotalMin[safetyType]);
+            console.log('Residual time before dive2: ' + maxResidualTime);
+         }
          if (isNaN(d2_min) || d2_min < 0 || maxResidualTime < 0) {
             throw new InputError('d2_min', '1 to ' + maxTotalMin[safteyType]);
          } else if (maxResidualTime < minPossibleResidualTime) {
@@ -107,7 +111,7 @@ var DiveCalc = (function() {
             // must wait until actualRNT < maxRNT
             try {
                var maxGroupAfterWait
-                = this._findMaxGroupGivenMaxRNT(maxResidualTime);
+                = this._findMaxGroupGivenMaxRNT(d2_depth, maxResidualTime);
             } catch (e) {
                if (e instanceof InputError) {
                   if (e.fieldName === 'rnt') {
@@ -124,13 +128,19 @@ var DiveCalc = (function() {
             }
          }
 
-         retVal['minTime_' + safteyType] =
+         retVal['minutes_' + safetyType] =
           this._getMinTimeBetweenDives(firstDiveStats.group, maxGroupAfterWait);
+
+         if (this.debug) {
+            console.log('Max group before dive2: ' + maxGroupAfterWait);
+            console.log('min_' + safetyType + ': ' + retVal['minutes_' +
+             safetyType]);
+         }
       }.bind(this));
 
-      retVal['dive1SS']    = firstDiveStats.safteyStop;
-      retVal['dive1Limit'] = firstDiveStats.decompLimit;
-      retVal['dive1Min']   = firstDiveStats.assumedMin;
+      retVal['dive1_ss']    = !!firstDiveStats.safteyStop;
+      retVal['dive1_limit'] = !!firstDiveStats.decompLimit;
+      retVal['dive1_actual_min']   = firstDiveStats.assumedMin;
 
       return retVal;
    }
@@ -142,8 +152,8 @@ var DiveCalc = (function() {
     *
     * return 0 if there is no applicable total time (eg clear on last few columns).
     */
-   function _getMaxTotalTime(saftey, depth) {
-      if (!this._isValidDepth(depth, 1) {
+   function _getMaxTotalTime(safetyType, depth) {
+      if (!this._isValidDepth(depth, 1)) {
          throw new InputError('depth', this._getValidDepths(1).join(', '));
       }
 
@@ -151,15 +161,16 @@ var DiveCalc = (function() {
          return col.depth == depth;
       })[0];
 
-      switch (type) {
+      switch (safetyType) {
          case 'clear':
-            for (var row in col.rows) {
-               if (lastRow && lastRow.min < row.min) {
+            for (var rowIndex in col.rows) {
+               var row = col.rows[rowIndex];
+               if (lastRow && lastRow.min >= row.min) {
                   throw new TableDataError('Minutes are not ascending in ' +
                    'table 1');
                }
                if (row.ss) {
-                  if (!lastrow) {
+                  if (!lastRow) {
                      throw new TableDataError('No clear rows in table 1');
                   }
                   return lastRow.min;
@@ -175,8 +186,9 @@ var DiveCalc = (function() {
          case 'ss':
             var ssFound = false;
 
-            for (var row in col.rows) {
-               if (lastRow && lastRow.min < row.min) {
+            for (var rowIndex in col.rows) {
+               var row = col.rows[rowIndex];
+               if (lastRow && lastRow.min >= row.min) {
                   throw new TableDataError('Minutes are not ascending in ' +
                    'table 1');
                }
@@ -210,8 +222,9 @@ var DiveCalc = (function() {
          case 'limit':
             var ssFound = false;
             var limitFound = false;
-            for (var row in col.rows) {
-               if (lastRow && lastRow.min < row.min) {
+            for (var rowIndex in col.rows) {
+               var row = col.rows[rowIndex];
+               if (lastRow && lastRow.min >= row.min) {
                   throw new TableDataError('Minutes are not ascending in ' +
                    'table 1');
                }
@@ -295,11 +308,11 @@ var DiveCalc = (function() {
    function _getValidDepths(table) {
       switch (table) {
          case 1:
-            return tables[table].columns.map(function(col) {
+            return this.tables[table].columns.map(function hasCol(col) {
                return col.depth;
             });
          case 3:
-            return tables[table].rows.map(function(row) {
+            return this.tables[table].rows.map(function hasRow(row) {
                return row.depth;
             });
          default:
@@ -325,9 +338,9 @@ var DiveCalc = (function() {
          throw new InputError('depth', this._getValidDepths(3).join(', '));
       }
       var row = this.tables[3].rows.filter(function hasDepth(row) {
-         return row.depth == depth;
+         return row.depth === depth;
       })[0];
-      return row[row.cols.length - 1].rnt;
+      return row.cols[row.cols.length - 1].rnt;
    }
 
    /**
@@ -353,7 +366,7 @@ var DiveCalc = (function() {
             if (col.rnt === null) {
                throw new InputError('rnt', '1 to ' + row.cols[i+1].rnt);
             } else if (col.rnt <= rnt) {
-               var group = row.cols.length - i;
+               var group = row.cols.length - i - 1;
                if (row[i] == rnt) {
                   break;
                }

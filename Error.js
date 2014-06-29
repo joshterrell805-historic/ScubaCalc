@@ -17,7 +17,7 @@ ExtendableError.prototype.constructor = ExtendableError;
  * Throw when input is unexceptable.
  */
 function InputError(fieldName, humanReadableExpectedValue) {
-   ExtendableError.call(this, field + ' has an invalid value');
+   ExtendableError.call(this, fieldName + ' has an invalid value');
    this.fieldName = fieldName;
    this.humanReadableExpectedValue = humanReadableExpectedValue;
 }
