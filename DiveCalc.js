@@ -70,8 +70,19 @@ var DiveCalc = (function constructDiveCalcClass() {
          throw new InputError('d2_depth', this._getValidDepths(3).join(', '));
       }
 
+      try {
+         var clearMin = this._getMaxTotalTime('clear', d2_depth);
+      } catch (e) {
+         if (e instanceof TableDataError &&
+          e.message === 'No clear rows in table 1') {
+            clearMin = Number.POSITIVE_INFINITY;
+         } else {
+            throw e;
+         }
+      }
+
       var maxTotalMin = {
-         'clear' : this._getMaxTotalTime('clear', d2_depth),
+         'clear' : clearMin,
          'ss'    : this._getMaxTotalTime('ss', d2_depth),
          'limit' : this._getMaxTotalTime('limit', d2_depth)
       };
@@ -82,6 +93,9 @@ var DiveCalc = (function constructDiveCalcClass() {
 
       if (this.debug) {
          console.log('Group after dive 1: ' + firstDiveStats.group);
+         console.log('AM dive1: ' + firstDiveStats.assumedMin);
+         console.log('SS dive1? ' + !!firstDiveStats.safetyStop);
+         console.log('DL dive1? ' + !!firstDiveStats.decompLimit);
       }
 
       // calculate the minimum minutes to wait between dives for each saftey type
@@ -101,6 +115,17 @@ var DiveCalc = (function constructDiveCalcClass() {
             console.log('Max total min dive2: ' + maxTotalMin[safetyType]);
             console.log('Residual time before dive2: ' + maxResidualTime);
          }
+
+         if (maxTotalMin[safetyType] === Number.POSITIVE_INFINITY) {
+            retVal['minutes_' + safetyType] = maxTotalMin[safetyType];
+            if (this.debug) {
+               console.log('Max group before dive2: ' + maxGroupAfterWait);
+               console.log('min_' + safetyType + ': ' + retVal['minutes_' +
+                safetyType]);
+            }
+            return;
+         }
+
          if (isNaN(d2_min) || d2_min < 0 || maxResidualTime < 0) {
             throw new InputError('d2_min', '1 to ' + maxTotalMin[safteyType]);
          } else if (maxResidualTime < minPossibleResidualTime) {
@@ -138,7 +163,7 @@ var DiveCalc = (function constructDiveCalcClass() {
          }
       }.bind(this));
 
-      retVal['dive1_ss']    = !!firstDiveStats.safteyStop;
+      retVal['dive1_ss']    = !!firstDiveStats.safetyStop;
       retVal['dive1_limit'] = !!firstDiveStats.decompLimit;
       retVal['dive1_actual_min']   = firstDiveStats.assumedMin;
 

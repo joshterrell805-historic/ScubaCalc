@@ -2,9 +2,6 @@ var   assert = require('assert'),
       fs = require('fs'),
       async = require('async');
 
-fs.readFile('DiveCalc.js', {'encoding': 'utf-8'}, function onFile(err, data) {
-});
-
 function DiveCalcTest() {
    async.map(['Error.js', 'decompression_tables.json', 'DiveCalc.js'],
     fs.readFile, function loadResources(err, buffers) {
@@ -58,7 +55,12 @@ function run() {
    this.test({d1_min: 38, d1_depth: 35, d2_min: 34, d2_depth: 60},
     {minutes_clear: 54, minutes_ss: 7, minutes_limit: 0, dive1_ss: false,
     dive1_limit: false, dive1_actual_min: 40});
-    console.log('\nAll tests passed.');
+
+   this.test({d1_min: 13, d1_depth: 110, d2_min: 14, d2_depth: 100},
+    {minutes_clear: Number.POSITIVE_INFINITY, minutes_ss: 114, minutes_limit:
+    66, dive1_ss: true, dive1_limit: false, dive1_actual_min: 13});
+
+   console.log('\nAll tests passed.');
 }
 
 var test = new DiveCalcTest();
