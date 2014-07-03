@@ -1,0 +1,55 @@
+,input values,,,,output,,,,,,,errors (no output),,,
+comment (what's this data test),min1,depth1,min2,depth2,minutes_clear,minutes_ss,minutes_limit,dive1_ss?,dive1_limit?,dive1_actual_min,group after dive 2,invalid depth1?,invalid depth2?,min1 invalid,min2 invalid
+testing rounding (min1 and min2),38,35,34,60,54m,7m,0m,no,no,40m,,no,no,no,no
+testing safety stop required (dive1 and dive2),13,110,14,100,inf,1h54m,1h6m,yes,no,13m,,no,no,no,no
+test rounding min1,40,35,34,60,54m,7m,0m,no,no,40m,,no,no,no,no
+testing safety stop required (dive1),168,35,117,35,2h54m,40m,27m,yes,no,168m,,no,no,no,no
+testing rounding min2,38,35,35,60,54m,7m,0m,no,no,40m,,no,no,no,no
+safety stop required dive1,36,70,40,35,7m,0m,0m,yes,no,36m,,no,no,no,no
+safety stop required dive2,40,35,36,70,inf,1h48m,1h48m,no,no,40m,,no,no,no,no
+dives that dont require rounding or safty stops,31,40,36,35,0m,0m,0m,no,no,31m,,no,no,no,no
+limit hit,205,35,140,40,inf,inf,6h1m,yes,yes,205m,,no,no,no,no
+limit hit dive2,22,70,10,130,inf,inf,5h1m,no,no,22m,,no,no,no,no
+non safety stop to safety stop,16,90,11,100,inf,44m,35m,no,no,16m,,no,no,no,no
+safety stop to non safety stop,11,100,16,40,0m,0m,0m,yes,no,11m,,no,no,no,no
+errors rounding dive 1 and 2 depth,11,34,12,66,,,,,,,,yes,yes,no,no
+error rounding dive 1 depth,11,-1,4,60,,,,,,,,yes,no,no,no
+error rounding dive 2 depth,17,35,8,61,,,,,,,,no,yes,no,no
+error after NDL dive 1 and 2,145,40,50,90,,,,,,,,no,no,yes,yes
+error after NDL dive 1 ,145,40,10,90,,,,,,,,no,no,yes,no
+error after NDL dive 2,10,40,50,90,,,,,,,,no,no,no,yes
+invalid min 1 and min 2,0,35,0,35,,,,,,,,no,no,yes,yes
+invalid min 1,0,35,1,35,,,,,,,,no,no,yes,no
+invalid min 2,1,35,-1,40,,,,,,,,no,no,no,yes
+three year old error,45219841,654654654,8984651894,6516465,,,,,,,,yes,yes,yes,yes
+,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+,,,,,,"Given the min1, depth1, min2, and depth2.. what are the following values?",,,,,,,,,
+,,,,,,,,,,,,,,,
+,,,,,,minutes_clear,what is the minimum amount of minutes a diver must wait in between dive 1 and dive 2 in order to not have to take a saftey stop on dive 2,,,,,,,,
+,,,,,,minutes_ss,what is the minimum amount of minutes a diver must wait in between dive 1 and dive 2 in order to make dive 2 safely as long as they take a safety stop,,,,,,,,
+,,,,,,minutes_limit,what is the minimum amount of minutes a diver must wait in between dive 1 and dive 2 in order to make dive 2 sort of safely as long as they follow the proper no-decompression limit procedure.. they hit a no-decompression limit on dive 2,,,,,,,,
+,,,,,,dive1_ss,must the diver make a safety stop on dive 1? (yes or no),,,,,,,,
+,,,,,,dive1_limit,did the diver hit a decompression limit on dive 1? (yes or no),,,,,,,,
+,,,,,,dive1_actual_min,"if the diver provided a valid depth, but a value for min1 which is not in that depth's column (table1) we always round up to the next minutes.. what are the actual minutes we used to calculate the group the diver is in after dive 1?",,,,,,,,
+,,,,,,,,,,,,,,,
+,,,,,,"if min1, depth1, min2, or depth2 are invalid... the function throws an error rather than returning the 6 values above",,,,,,,,,
+,,,,,,,,,,,,,,,
+,,,,,,invalid depth1,depth1 is invalid if it is not on table 1,,,,,,,,
+,,,,,,invalid depth2,depth 2 is invalid if it is not a depth listed in BOTH table 1 AND table 2,,,,,,,,
+,,,,,,invalid min1,min > no-decompression limit OR min < 1 OR min is not a whole number,,,,,,,,
+,,,,,,invalid min2,min > no-decompression limit OR min < 1 OR min is not a whole number,,,,,,,,
+,,,,,,,,,,,,,,,
+,,,,,,PROCESS,,,,,,,,,
+,,,,,,get group after dive1,,,,,,,,,
+,,,,,,"get total time of dive 2 at safety type (clear, ss, limit)",,,,,,,,,
+,,,,,,residual time = total time dive 2 - actual time dive 2,,,,,,,,,
+,,,,,,lookup depth and residual time on table 3 to obtain the max group before dive 2 (always round down if depth doesn't match exactly),,,,,,,,,
+,,,,,,"now you know group after dive 1, and max group before dive 2.. use table 2 to determine the time",,,,,,,,,
