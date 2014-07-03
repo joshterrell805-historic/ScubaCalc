@@ -5,7 +5,7 @@ var CsvToArray = require('./CsvToArray.njs');
 if (require.main === module) {
    var testDataObj = testDataToObj(
     CsvToArray(fs.readFileSync('./test_data.csv').toString()));
-   fs.writeFile('./test_data.json', testDataObj);
+   fs.writeFile('./test_data.json', JSON.stringify(testDataObj));
 }
 
 function testDataToObj(testDataArray) {
@@ -41,12 +41,12 @@ function testDataToObj(testDataArray) {
       if (!anyErrors()) {
          test.expectedErrors = false;
          test.expectedOutput= {
-            minTime_clear  : strToTime(row[5]),
-            minTime_ss     : strToTime(row[6]),
-            minTime_limit  : strToTime(row[7]),
-            dive1SS        : strToBool(row[8]),
-            dive1Limit     : strToBool(row[9]),
-            dive1Min       : strToTime(row[10])
+            minutes_clear     : strToTime(row[5]),
+            minutes_ss        : strToTime(row[6]),
+            minutes_limit     : strToTime(row[7]),
+            dive1_ss          : strToBool(row[8]),
+            dive1_limit       : strToBool(row[9]),
+            dive1_actual_min  : strToTime(row[10])
             /* groupAfterDive1 : 11 .. not used atm*/
          };
       } else {

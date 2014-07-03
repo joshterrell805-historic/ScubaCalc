@@ -3,7 +3,11 @@ var   assert = require('assert'),
       async = require('async');
 
 function DiveCalcTest() {
-   async.map(['Error.js', 'decompression_tables.json', 'DiveCalc.js'],
+   this.debug = true;
+   this.diveCalcDebug = false;
+
+   async.map(['Error.js', 'decompression_tables.json', 'DiveCalc.js',
+    'test_data.json'],
     fs.readFile, function loadResources(err, buffers) {
       if (err) {
          throw err;
@@ -12,7 +16,8 @@ function DiveCalcTest() {
       eval.call(global, buffers[0].toString());
       var tablesJson = buffers[1].toString();
       eval.call(global, buffers[2].toString());
-      this.diveCalc = new global.DiveCalc(tablesJson, false);
+      this.diveCalc = new global.DiveCalc(tablesJson, this.diveCalcDebug);
+      this.tests = JSON.parse(buffers[3]);
 
       this.run();
    }.bind(this));
@@ -22,12 +27,17 @@ DiveCalcTest.prototype.run = run;
 DiveCalcTest.prototype.test = test;
 
 function test(input, output, errors) {
+   if (this.debug) {
+      console.log('input: ', input);
+      console.log('output: ', output);
+      console.log('errors: ', errors);
+   }
    try {
       var result = this.diveCalc.calcWaitTime.apply(this.diveCalc,
        Object.keys(input).map(function toVal(key) { return input[key];}));
    } catch (e) {
       var unexpected = false;
-      if (typeof errors === 'undefined') {
+      if (errors === false) {
          unexpected = true;
       } else {
          if (e instanceof InputError) {
@@ -40,9 +50,6 @@ function test(input, output, errors) {
       }
 
       if (unexpected) {
-         console.log('\nTest failed (unexpected error)');
-         process.stdout.write('input: ');
-         console.log(input);
          throw e;
       }
    }
@@ -52,15 +59,30 @@ function test(input, output, errors) {
 }
 
 function run() {
-   this.test({d1_min: 38, d1_depth: 35, d2_min: 34, d2_depth: 60},
-    {minutes_clear: 54, minutes_ss: 7, minutes_limit: 0, dive1_ss: false,
-    dive1_limit: false, dive1_actual_min: 40});
+   var errors = [];
 
-   this.test({d1_min: 13, d1_depth: 110, d2_min: 14, d2_depth: 100},
-    {minutes_clear: Number.POSITIVE_INFINITY, minutes_ss: 114, minutes_limit:
-    66, dive1_ss: true, dive1_limit: false, dive1_actual_min: 13});
-
-   console.log('\nAll tests passed.');
+   this.tests.forEach(function(test) {
+      try {
+         this.test(test.input, test.expectedOutput, test.expectedErrors);
+      } catch (e) {
+         e.test = test;
+         errors.push(e);
+      }
+   }.bind(this));
+   
+   if (errors.length) {
+      console.log('\n');
+      errors.forEach(function(e) {
+         console.error('=====================================================');
+         console.error(e.test);
+         console.error('\n');
+         console.error(e.stack);
+      });
+      console.log('\n\n');
+      console.log(errors.length + '/' + this.tests.length + ' tests failed.');
+   } else {
+      console.log('\nAll tests passed!');
+   }
 }
 
 var test = new DiveCalcTest();

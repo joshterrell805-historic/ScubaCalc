@@ -31,17 +31,17 @@ var DiveCalc = (function constructDiveCalcClass() {
     * {
     *    'minTime_clear' : (int) The minimum time (in minutes) the diver must wait
     *                      between dives to be "in the clear" on his second dive.
-    *                      May be +inf if there are no times without saftey stop
+    *                      May be +inf if there are no times without safety stop
     *                      required (Number.POSITIVE_INFINITY).
     *    'minTime_ss'    : (int) The minimum time (in minutes) the diver must wait
     *                      between dives in order to safely meet his second dive
-    *                      as long as he takes a saftey stop.
+    *                      as long as he takes a safety stop.
     *    'minTime_limit' : (int) The minimum time (in minutes) the diver must wait
     *                      between dives in order to barely make his second dive
     *                      safely. Using this wait time, the diver has hit a
     *                      decompression limit.
     *    'dive1SS'       : (bool) True/false indicating whether the diver should
-    *                      take a saftey stop on his first dive.
+    *                      take a safety stop on his first dive.
     *    'dive1Limit'    : (bool) True/false indicating whether the diver hit a
     *                      decompression limit on his first dive.
     *    'dive1Min'      : (int) The assumed minutes made for dive 1. The tables
@@ -59,6 +59,8 @@ var DiveCalc = (function constructDiveCalcClass() {
    function calcWaitTime(d1_min, d1_depth, d2_min, d2_depth) {
       d1_min = parseInt(d1_min);
       d2_min = parseInt(d2_min);
+      d1_depth = parseInt(d1_depth);
+      d2_depth = parseInt(d2_depth);
 
       if (!this._isValidDepth(d1_depth, 1)) {
          throw new InputError('d1_depth', this._getValidDepths(1).join(', '));
@@ -98,10 +100,10 @@ var DiveCalc = (function constructDiveCalcClass() {
          console.log('DL dive1? ' + !!firstDiveStats.decompLimit);
       }
 
-      // calculate the minimum minutes to wait between dives for each saftey type
+      // calculate the minimum minutes to wait between dives for each safety type
       Object.keys(maxTotalMin).forEach(function minTime(safetyType) {
          // max residual nitrogen time possible when making dive 2 at the
-         // specified dive 2 saftey type for the specified min.
+         // specified dive 2 safety type for the specified min.
          // calculated from
          //                      rnt + dive time = max total min
          //
@@ -127,7 +129,7 @@ var DiveCalc = (function constructDiveCalcClass() {
          }
 
          if (isNaN(d2_min) || d2_min < 0 || maxResidualTime < 0) {
-            throw new InputError('d2_min', '1 to ' + maxTotalMin[safteyType]);
+            throw new InputError('d2_min', '1 to ' + maxTotalMin[safetyType]);
          } else if (maxResidualTime < minPossibleResidualTime) {
             // must wait until rnt = 0
             // the group before making dive 2--or after waiting.
@@ -229,7 +231,7 @@ var DiveCalc = (function constructDiveCalcClass() {
                } else {
                   if (row.limit) {
                      if (!lastRow.ss) {
-                        throw new TableDataError('Saftey stop cell is not the ' +
+                        throw new TableDataError('Safety stop cell is not the ' +
                          'column previous to the limit column.');
                      }
                      return lastRow.min;
@@ -241,8 +243,8 @@ var DiveCalc = (function constructDiveCalcClass() {
                }
                var lastRow = row;
             }
-            throw new TableDataError('Table 1 doesn\'t have saftey stop ' +
-             'cells or ended on a saftey stop (all should end in limit)');
+            throw new TableDataError('Table 1 doesn\'t have safety stop ' +
+             'cells or ended on a safety stop (all should end in limit)');
 
          case 'limit':
             var ssFound = false;
@@ -267,7 +269,7 @@ var DiveCalc = (function constructDiveCalcClass() {
                      if (row.limit) {
                         limitFound = true;
                         if (!lastRow.ss) {
-                           throw new TableDataError('Saftey stop cell is not '
+                           throw new TableDataError('Safety stop cell is not '
                             + 'the column previous to the limit column.');
                         }
                      } else if (!row.ss) {
@@ -295,7 +297,7 @@ var DiveCalc = (function constructDiveCalcClass() {
             }
             return lastRow.min;
          default:
-            throw new InputError('saftey', "'clear', 'ss', or 'limit'");
+            throw new InputError('safety', "'clear', 'ss', or 'limit'");
       }
    }
 
