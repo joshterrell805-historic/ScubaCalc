@@ -97,7 +97,15 @@ var DiveCalc = (function constructDiveCalcClass() {
 
       var retVal = {};
 
-      var firstDiveStats = this._getDiveStats(d1_min, d1_depth);
+      try {
+         var firstDiveStats = this._getDiveStats(d1_min, d1_depth);
+      } catch(e) {
+         if (e instanceof InputError && e.fieldName === 'min') {
+            throw new InputError('d1_min', e.humanReadableExpectedValue);
+         } else {
+            throw e;
+         }
+      }
 
       if (this.debug) {
          console.log('Group after dive 1: ' + firstDiveStats.group);
