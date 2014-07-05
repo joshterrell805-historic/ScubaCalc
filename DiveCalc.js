@@ -205,7 +205,7 @@ var DiveCalc = (function constructDiveCalcClass() {
          case 'clear':
             for (var rowIndex in col.rows) {
                var row = col.rows[rowIndex];
-               if (lastRow && lastRow.min >= row.min) {
+               if (lastRow && lastRow.min > row.min) {
                   throw new TableDataError('Minutes are not ascending in ' +
                    'table 1');
                }
@@ -228,7 +228,7 @@ var DiveCalc = (function constructDiveCalcClass() {
 
             for (var rowIndex in col.rows) {
                var row = col.rows[rowIndex];
-               if (lastRow && lastRow.min >= row.min) {
+               if (lastRow && lastRow.min > row.min) {
                   throw new TableDataError('Minutes are not ascending in ' +
                    'table 1');
                }
@@ -264,7 +264,7 @@ var DiveCalc = (function constructDiveCalcClass() {
             var limitFound = false;
             for (var rowIndex in col.rows) {
                var row = col.rows[rowIndex];
-               if (lastRow && lastRow.min >= row.min) {
+               if (lastRow && lastRow.min > row.min) {
                   throw new TableDataError('Minutes are not ascending in ' +
                    'table 1');
                }
@@ -451,7 +451,13 @@ var DiveCalc = (function constructDiveCalcClass() {
          if (min >= col.rows[i].min) {
             if (min < col.rows[i+1].min) {
                if (min == col.rows[i].min) {
-                  row = col.rows[i];
+                  // Sometimes there are two rows consecuatively with the same
+                  // minutes (maybe even 3?) always round up the group for
+                  // safety reasons.
+                  for(var j = i; j < col.rows.length &&
+                   col.rows[i] === col.rows[j]; ++j) {
+                     row = col.rows[j];
+                  }
                } else { // greater than; round up
                   row = col.rows[i+1];
                }
