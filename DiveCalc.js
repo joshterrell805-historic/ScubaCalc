@@ -89,6 +89,12 @@ var DiveCalc = (function constructDiveCalcClass() {
          'limit' : this._getMaxTotalTime('limit', d2_depth)
       };
 
+      // The diver specified an invalid depth 2, one that may have been
+      // not a number or off the chart for this depth.
+      if (isNaN(d2_min) || d2_min < 0 || d2_min > maxTotalMin['limit']) {
+         throw new InputError('d2_min', '1 to ' + maxTotalMin['limit']);
+      }
+
       var retVal = {};
 
       var firstDiveStats = this._getDiveStats(d1_min, d1_depth);
@@ -128,8 +134,15 @@ var DiveCalc = (function constructDiveCalcClass() {
             return;
          }
 
-         if (isNaN(d2_min) || d2_min < 0 || maxResidualTime < 0) {
-            throw new InputError('d2_min', '1 to ' + maxTotalMin[safetyType]);
+         // The second dive isn't possible given this saftey type for dive 2.
+         if (maxResidualTime < 0) {
+            retVal['minutes_' + safetyType] = Number.POSITIVE_INFINITY;
+            if (this.debug) {
+               console.log('Max group before dive2: ' + maxGroupAfterWait);
+               console.log('min_' + safetyType + ': ' + retVal['minutes_' +
+                safetyType]);
+            }
+            return;
          } else if (maxResidualTime < minPossibleResidualTime) {
             // must wait until rnt = 0
             // the group before making dive 2--or after waiting.
@@ -485,8 +498,8 @@ var DiveCalc = (function constructDiveCalcClass() {
       if (groupAfterFirstDive < 0 || groupAfterFirstDive > 25) {
          throw new InputError('groupAfterFirstDive', '0 to 25');
       }
-      if (maxGroupBeforeSecondDive < 0 || maxGroupBeforeSecondDive > 25) {
-         throw new InputError('maxGroupBeforeSecondDive', '0 to 25');
+      if (maxGroupBeforeSecondDive < -1 || maxGroupBeforeSecondDive > 25) {
+         throw new InputError('maxGroupBeforeSecondDive', '-1 to 25');
       }
 
       var row = this.tables[2].rows[25 - groupAfterFirstDive];

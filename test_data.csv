@@ -8,7 +8,7 @@ testing rounding min2,38,35,35,60,54m,7m,0m,no,no,40m,,no,no,no,no
 safety stop required dive1,36,70,40,35,7m,0m,0m,yes,no,36m,,no,no,no,no
 safety stop required dive2,40,35,36,70,inf,1h48m,1h48m,no,no,40m,,no,no,no,no
 dives that dont require rounding or safty stops,31,40,36,35,0m,0m,0m,no,no,31m,,no,no,no,no
-limit hit,205,35,140,40,inf,inf,6h1m,yes,yes,205m,,no,no,no,no
+limit hit,205,35,140,40,inf,inf,6h1m,no,yes,205m,,no,no,no,no
 limit hit dive2,22,70,10,130,inf,inf,5h1m,no,no,22m,,no,no,no,no
 non safety stop to safety stop,16,90,11,100,inf,44m,35m,no,no,16m,,no,no,no,no
 safety stop to non safety stop,11,100,16,40,0m,0m,0m,yes,no,11m,,no,no,no,no
