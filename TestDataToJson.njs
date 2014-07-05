@@ -32,10 +32,10 @@ function testDataToObj(testDataArray) {
       };
 
       var errors = {
-         depth1      : strToBool(row[12]),
-         depth2      : strToBool(row[13]),
-         min1        : strToBool(row[14]),
-         min2        : strToBool(row[15])
+         d1_depth      : strToBool(row[12]),
+         d2_depth      : strToBool(row[13]),
+         d1_min        : strToBool(row[14]),
+         d2_min        : strToBool(row[15])
       };
 
       if (!anyErrors()) {
@@ -60,7 +60,8 @@ function testDataToObj(testDataArray) {
    return tests;
 
    function anyErrors() {
-      return errors.depth1 || errors.depth2 || errors.min1 || errors.min2;
+      return errors.d1_depth || errors.d2_depth ||
+       errors.d1_min || errors.d2_min;
    }
 }
 

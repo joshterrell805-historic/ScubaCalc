@@ -67,7 +67,12 @@ function test(input, output, errors) {
       }
    }
 
-   assert.deepEqual(result, output);
+   // If an error happened that was supposed to happen, don't try to validate
+   // the results of the calculation (there are none except for the error
+   // which was already validated at this point).
+   if (!errors) {
+      assert.deepEqual(result, output);
+   }
    process.stdout.write('.');
 }
 
