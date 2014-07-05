@@ -3,7 +3,7 @@ var   assert = require('assert'),
       async = require('async');
 
 function DiveCalcTest() {
-   this.debug = true;
+   this.debug = false;
    this.diveCalcDebug = false;
 
    async.map(['Error.js', 'decompression_tables.json', 'DiveCalc.js',
@@ -17,7 +17,20 @@ function DiveCalcTest() {
       var tablesJson = buffers[1].toString();
       eval.call(global, buffers[2].toString());
       this.diveCalc = new global.DiveCalc(tablesJson, this.diveCalcDebug);
-      this.tests = JSON.parse(buffers[3]);
+      this.tests = JSON.parse(buffers[3].toString());
+      this.tests.forEach(function testNullToInfinity(test) {
+         // as noted in the TestDataToJson conversion utility, JSON
+         // doesn't store Number.POSITIVE_INFINITY. Use null to denote
+         // infinity, and convert it here before running tests.
+         if (test.expectedOutput) {
+            var keys = Object.keys(test.expectedOutput);
+            keys.forEach(function outputNullToInfinity(key) {
+               if (test.expectedOutput[key] === null) {
+                  test.expectedOutput[key] = Number.POSITIVE_INFINITY;
+               }
+            });
+         }
+      });
 
       this.run();
    }.bind(this));

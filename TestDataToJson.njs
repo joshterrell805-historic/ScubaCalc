@@ -80,7 +80,9 @@ function strToBool(str) {
 // or the string is 'inf'
 function strToTime (str) {
    if (str === 'inf') {
-      return Number.POSITIVE_INFINITY;
+      // JSON can't store NUMBER.POSTIVE_INFINITY
+      // use null to denote infinity
+      return null;
    } else {
       var matches = str.match(/^((\d*)h){0,1}(\d*)m$/);
       assert(matches.length > 0);
