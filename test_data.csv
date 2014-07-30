@@ -3,10 +3,10 @@ comment (what's this data test),min1,depth1,min2,depth2,minutes_clear,minutes_ss
 testing rounding (min1 and min2),38,35,34,60,54m,7m,0m,no,no,40m,,no,no,no,no
 testing safety stop required (dive1 and dive2),13,110,14,100,inf,1h54m,1h6m,yes,no,13m,,no,no,no,no
 test rounding min1,40,35,34,60,54m,7m,0m,no,no,40m,,no,no,no,no
-testing safety stop required (dive1),168,35,117,35,2h54m,40m,27m,yes,no,168m,,no,no,no,no
-testing rounding min2,38,35,35,60,54m,7m,0m,no,no,40m,,no,no,no,no
-safety stop required dive1,36,70,40,35,7m,0m,0m,yes,no,36m,,no,no,no,no
-safety stop required dive2,40,35,36,70,inf,1h48m,1h48m,no,no,40m,,no,no,no,no
+testing safety stop required (dive1),168,35,117,35,2h6m,40m,27m,yes,no,168m,,no,no,no,no
+testing rounding min2,38,35,35,60,54m,7m,7m,no,no,40m,,no,no,no,no
+safety stop required dive1,36,70,40,35,4m,0m,0m,yes,no,36m,,no,no,no,no
+safety stop required dive2,40,35,36,70,inf,4h43m,4h43m,no,no,40m,,no,no,no,no
 dives that dont require rounding or safty stops,31,40,36,35,0m,0m,0m,no,no,31m,,no,no,no,no
 limit hit,205,35,140,40,inf,inf,6h1m,no,yes,205m,,no,no,no,no
 limit hit dive2,22,70,10,130,inf,inf,5h1m,no,no,22m,,no,no,no,no
@@ -23,7 +23,7 @@ invalid min 1,0,35,1,35,,,,,,,,no,no,yes,no
 invalid min 2,1,35,-1,40,,,,,,,,no,no,no,yes
 three year old error,45219841,654654654,8984651894,6516465,,,,,,,,yes,yes,yes,yes
 ,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,
+todo: make a few new tests (maybe 2) dealing with table 1 minutes where two rows have the same minutes consecutively,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,
