@@ -2,7 +2,8 @@ document.onready = function() {
    $('#clear-button').click(clearAll);
    $('#calculate-button').click(calculate);
    $.get('decompression_tables.json', function(tables) {
-      window.tables = JSON.parse(tables);
+      //window.tables = JSON.parse(tables);
+      window.tables = tables;
    });
 };
 
@@ -22,6 +23,8 @@ function clearAll() {
    $("#notice").hide();
 }
 
+var d1, m1, m2, d2;
+
 function calculate() {
    if (typeof window.tables == "undefined") {
       setError("please wait a second or so for the decompression tables " +
@@ -29,10 +32,10 @@ function calculate() {
       return;
    }
 
-   var d1 = $('#dive-1 .depth').val();
-   var m1 = $('#dive-1 .minutes').val();
-   var m2 = $('#dive-2 .minutes').val();
-   var d2 = $('#dive-2 .depth').val();
+   d1 = $('#dive-1 .depth').val();
+   m1 = $('#dive-1 .minutes').val();
+   m2 = $('#dive-2 .minutes').val();
+   d2 = $('#dive-2 .depth').val();
 
    var dive1data = dive1(d1, m1);
    var dive2data = dive2(d2, m2);

@@ -2,7 +2,7 @@ document.onready = function()
 {
    $.get('decompression_tables.json', function(tables)
    {
-      tables = JSON.parse(tables);
+      //tables = JSON.parse(tables);
 
       var table = tables[0];
       console.log(table);
